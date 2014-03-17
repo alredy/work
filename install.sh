@@ -6,7 +6,7 @@ echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docke
 apt-get update ; apt-get install -y lxc-docker
 #Troubleshooting
 cgroup_enable=memory swapaccount=1
-apt-get update && sudo apt-get install cgroup-lite
+sudo apt-get install cgroup-lite
 #Git clont
 cd /home/ 
 git clone https://github.com/alredy/work.git
