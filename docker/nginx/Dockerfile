@@ -1,8 +1,9 @@
-FROM ubuntu:13.10
-CMD apt-get install -y software-properties-common
-CMD add-apt-repository -y ppa:nginx/stable
-CMD apt-get update
-CMD apt-get install -y nginx
-CMD echo "\ndaemon off;" >> /etc/nginx/nginx.conf
+FROM ubuntu
+RUN apt-get install nginx -y
+RUN rm /etc/nginx/sites-enabled/default
+ADD proxy.conf /etc/nginx/sites-enabled/proxy
+ADD nginx_run.sh /opt/nginx_run.sh
+RUN chmod +x /opt/nginx_run.sh
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 EXPOSE 80
-ENTRYPOINT ["nginx"]
+CMD /opt/nginx_run.sh
