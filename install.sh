@@ -7,6 +7,8 @@ apt-get update ; apt-get install -y lxc-docker
 #Git clont
 cd /home/ 
 git clone https://github.com/alredy/work.git
-cd /home/work
+cd /home/work/docker/nginx
+docker build -t nginx .
+
 
 
