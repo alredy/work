@@ -4,5 +4,9 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A1D7869245C8950F966E9
 echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 # Install docker
 apt-get update ; apt-get install -y lxc-docker
-#Givi
+#Git clont
+cd /home/ 
+git clone https://github.com/alredy/work.git
+cd /home/work
+
 
