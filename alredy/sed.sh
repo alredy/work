@@ -1,0 +1,12 @@
+#!/bin/bash
+find ~/chef-repo/data_bags/users/ -name "*.json" | xargs -I {} sed -i -e 's/"roles"*/"roles": {
+                  "alredy-test": [
+                                              "ess",
+                                                                                  "root"
+                                                                                                                            ],
+                                                                                                                                                                            "capi": [
+                                                                                                                                                                                                                                      "root",
+                                                                                                                                                                                                                                                                                                        "dev"
+                                                                                                                                                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          }/g' {} && find ./ -name "*-e" | xargs rm 
