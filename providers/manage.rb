@@ -1,15 +1,25 @@
   action :create do
   search(:test_users) do |u|
-  unless u['roles'].to_a.empty?
+   search(:grammarly_groups) do |g|
+   group = g['id'].split(",")
+      if  u['groups'] == "system" && node['sys_dir']
+        user u['id'] do
+        shell "/bin/bash"
+        system true
+        end
+        directory "/opt/#{node['sys_dir']}" do
+        owner u['id']
+        group u['id']
+        mode "0700"
+        end
+      end
+
+
+ if u['roles'].to_a.any?
+ group = g['id'].split(",")
     roles = u['roles'].select{|role, groupname| node.roles.include?(role)} # {"role1" => "grp1", "role2" => "grp2"}
     roles.each do |role, groupname|
     
-      if groupname.empty? && u['groups']
-        @groups = u['groups'].join(", ")
-      else
-        @groups = roles.values.to_a.join(", ")
-      end 
-
       # group u['id'] do
        #   system true
        # end
@@ -20,37 +30,42 @@
         system true
     #    action :create
         end
-    if  u['type']  == "system" && node['sys_dir']
-        directory "/opt/#{node['sys_dir']}" do
-        owner u['id']
-        group u['id']
-        mode "6700"
-        end
-    end
 
-                    case @groups
-                          when  /root/
-                              group "root" do
+if groupname.empty? && u['groups'].nil? == false && u['groups'].any?{|g| group.include?(g)}
+        @groupname = group.join
+      elsif group.any?{|g| groupname.include?(g)}
+        @groupname = group.join
+end
+
+unless @groupname.nil? 
+          puts "_______"
+puts u['id']
+puts role
+puts @groupname
+
+                    # case @groups
+                    #       when  /root/
+                              group @groupname do
                               members u['id']
                               append true
                               action :create
                               end
-                              template "/etc/sudoers.d/#{u['id']}" do
-                              source "sudoers/root.erb"
-                              owner "root"
-                              group "root"
-                              mode "0440"
-                              variables :id => u['id']
-                              end
-                          when /dev/ 
-                              group "dev" do
-                              members u['id']
-                              append true
-                              action :create
-                              end       
-                    end
+                    #           template "/etc/sudoers.d/#{u['id']}" do
+                    #           source "sudoers/root.erb"
+                    #           owner "root"
+                    #           group "root"
+                    #           mode "0440"
+                    #           variables :id => u['id']
+                    #           end
+                    #       when /dev/ 
+                    #           group "dev" do
+                    #           members u['id']
+                    #           append true
+                    #           action :create
+                    #           end       
+                    # end
       
-
+end
       directory "/home/#{u['id']}"  do
         owner u['id']
         group u['id']
@@ -97,6 +112,8 @@ end
        end
      end
 end
+end
+
 end
 end
 

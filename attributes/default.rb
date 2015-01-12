@@ -1,7 +1,7 @@
 default['authorization']['sudo']['include_sudoers_d'] = true
 
-
 default['sys_dir'] = ['grammarly']
+dir = "/home/dir"
 
 
 # ruby
