@@ -1,85 +1,82 @@
-grammarly_users_manage "user" do
-end
-include_recipe "sudo"
-
-
-
-
-# search(:test_users) do |u|
-# search(:grammarly_groups) do |g|
-#  group = g['id'].split(",")
-# unless u['roles'].to_a.empty?
-#     roles = u['roles'].select{|role, groupname| node.roles.include?(role)} # {"role1" => "grp1", "role2" => "grp2"}
-#     roles.each do |role, groupname|
-# if groupname.empty? && u['groups'].nil? == false && u['groups'].any?{|g| group.include?(g)}
-#         @groupname = group.join
-#       elsif group.any?{|g| groupname.include?(g)}
-#         @groupname = group.join
+# grammarly_users_manage "user" do
 # end
+# include_recipe "sudo"
 
-# #unless @groupname.nil? 
-#          	puts "_______"
-# puts u['id']
-# puts role
-# puts @groupname
-# #end
+{"auth" => ""}
 
 
+search(:test_users) do |u|
+	if  u['roles'] == "system" && node['grammarly_users']['system']
+	        user u['id'] do
+		        shell "/bin/bash"
+		        system true
+	        end
+	end # if  u['roles'] == "system" && node['grammarly_users']['system']
+	search(:grammarly_groups) do |g|
+		group = g['id'].split(",")
 
-# end		
-# end
-# end
-# end
-
-
-    # roles.each do |role, groupname|
-    
-      # if groupname.empty? && u['groups']
-      #   @groupname = u['groups'].join(", ")
-      # else
-      #   @groupname = roles.values.to_a.join(", ")
-      # end 
-	
-
-					# case @groupname
-     #                      when  /g['id']/
-     #                      puts @groupname
-     #                      #     group "root" do
-     #                      #     members u['id']
-     #                      #     append true
-     #                      #     action :create
-     #                      #     end
-     #                      #     template "/etc/sudoers.d/#{u['id']}" do
-     #                      #     source "sudoers/root.erb"
-     #                      #     owner "root"
-     #                      #     group "root"
-     #                      #     mode "0440"
-     #                      #     variables :id => u['id']
-     #                      #     end
-     #                      # when /dev/ 
-     #                      #     group "dev" do
-     #                      #     members u['id']
-     #                      #     append true
-     #                      #     action :create
-     #                end       
-      
-      
+		unless u['roles'].to_a.empty?
+			if u['roles'].any?{|role, groupname| node.roles.include?(role)}
+				roles = u['roles'].select do |role, groupname|
+					user u['id'] do
+						home "/home/#{u['id']}"
+						shell "/bin/bash"
+						system true
+					end
 
 
-# puts g['id']
-# puts u['roles'].values
-# if u['roles'].values == g['id']
-# puts "__1__"
-# puts @groupname
-# end
+					if groupname.empty? && u['groups'].nil? == false && group.any?{|g| u['groups'].include?(g)}
+						groupname = group.join
+					elsif group.any?{|g| groupname.include?(g)}
+						groupname = group.join
+						group groupname do
+							members u['id']
+							append true
+							action :create
+						end
+						template "/etc/sudoers.d/#{u['id']}" do
+							source "sudoers/root.erb" #need varieble
+							owner "root"
+							group "root"
+							mode "0440"
+							variables :id => u['id']
+						end
+						directory "/home/#{u['id']}"  do
+							owner u['id']
+							group u['id']
+							mode 0700
+							action :create
+						end
+						directory "home/#{u['id']}/.ssh" do
+							owner u['id']
+							group u['id']
+							mode "0700"
+						end      
+						if u['ssh_keys']
+							template "home/#{u['id']}/.ssh/authorized_keys" do
+								source "authorized_keys.erb"
+								owner u['id']
+								group u['id'] 
+								mode "0600"
+								variables :ssh_keys => u['ssh_keys']
+							end
+						end #if u['ssh_keys']
 
-# if groupname == g['id']
-# puts "__2__"
-# puts groupname	
-# end
 
+					end #if groupname
+				end #roles = u['roles'].select do |role, groupname|
 
+			else #if u['roles'].any?{|role, groupname| node.roles.include?(role)}
+				user u['id'] do 
+					shell "/dev/null" 
+					action :manage 
+				end
+				directory "home/#{u['id']}/.ssh/" do
+					recursive true
+					action :delete
+				end	
 
-
-	# end
-
+			end #if u['roles'].any?{|role, groupname| node.roles.include?(role)}
+		end #unless u['roles'].to_a.empty?
+	end #search(:grammarly_groups) do |g|
+end #search(:test_users) do |u|

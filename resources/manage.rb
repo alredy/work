@@ -8,6 +8,9 @@ actions :create
 attribute :data_bag, :kind_of => String, :default => "test_users"
 attribute :dir,       :kind_of => String,          :default => "/home/dir"
 #attribute :ssh_keys,      :kind_of => [Array,String], :default => []
+
+
+
 def initialize(*args)
   super
   @action = :create
