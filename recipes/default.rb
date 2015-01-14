@@ -1,82 +1,48 @@
-# grammarly_users_manage "user" do
-# end
-# include_recipe "sudo"
-
-{"auth" => ""}
+ grammarly_users_manage "user" do
+ end
+ include_recipe "sudo"
 
 
-search(:test_users) do |u|
-	if  u['roles'] == "system" && node['grammarly_users']['system']
-	        user u['id'] do
-		        shell "/bin/bash"
-		        system true
-	        end
-	end # if  u['roles'] == "system" && node['grammarly_users']['system']
-	search(:grammarly_groups) do |g|
-		group = g['id'].split(",")
 
-		unless u['roles'].to_a.empty?
-			if u['roles'].any?{|role, groupname| node.roles.include?(role)}
-				roles = u['roles'].select do |role, groupname|
-					user u['id'] do
-						home "/home/#{u['id']}"
-						shell "/bin/bash"
-						system true
-					end
+# search(:test_users) do |u|
+# #	search(:grammarly_groups) do |g|
+# 	unless u['roles'].to_a.empty?
+# 		#if u['roles'].any?{|role, group| node.roles.include?(role)}
+# 		roles = u['roles'].select{|role, group| node.roles.include?(role)}
+# 			roles.each do |role, group|				 		# puts "___
+# 				group = u['groups'] if group.empty?
+# 				Array(group).each do |group| 
+            
 
-
-					if groupname.empty? && u['groups'].nil? == false && group.any?{|g| u['groups'].include?(g)}
-						groupname = group.join
-					elsif group.any?{|g| groupname.include?(g)}
-						groupname = group.join
-						group groupname do
-							members u['id']
-							append true
-							action :create
-						end
-						template "/etc/sudoers.d/#{u['id']}" do
-							source "sudoers/root.erb" #need varieble
-							owner "root"
-							group "root"
-							mode "0440"
-							variables :id => u['id']
-						end
-						directory "/home/#{u['id']}"  do
-							owner u['id']
-							group u['id']
-							mode 0700
-							action :create
-						end
-						directory "home/#{u['id']}/.ssh" do
-							owner u['id']
-							group u['id']
-							mode "0700"
-						end      
-						if u['ssh_keys']
-							template "home/#{u['id']}/.ssh/authorized_keys" do
-								source "authorized_keys.erb"
-								owner u['id']
-								group u['id'] 
-								mode "0600"
-								variables :ssh_keys => u['ssh_keys']
-							end
-						end #if u['ssh_keys']
-
-
-					end #if groupname
-				end #roles = u['roles'].select do |role, groupname|
-
-			else #if u['roles'].any?{|role, groupname| node.roles.include?(role)}
-				user u['id'] do 
-					shell "/dev/null" 
-					action :manage 
-				end
-				directory "home/#{u['id']}/.ssh/" do
-					recursive true
-					action :delete
-				end	
-
-			end #if u['roles'].any?{|role, groupname| node.roles.include?(role)}
-		end #unless u['roles'].to_a.empty?
-	end #search(:grammarly_groups) do |g|
-end #search(:test_users) do |u|
+#             template "/etc/sudoers.d/#{u['id']}" do
+#               source "sudoers/root.erb" #need varieble
+#               owner "root"
+#               group "root"
+#               mode "0440"
+#               variables :id => u['id']
+#             end		 			
+		 			
+# 		 			`cat /etc/passwd | awk -F: '{print $1}'`.split.each do |local_user|
+# 						`cat /etc/group| grep #{u['id']}| awk -F: '{print $1}'| grep -v #{u['id']}`.split.each do |local_group|
+# 							local_users = {u['id'] => local_group}
+# 							chef_users = {u['id'] => group}		
+# 								unless local_users.to_s.include? chef_users.to_s
+# 									group local_group do
+# 		                    			excluded_members u['id']
+# 		                    			append true
+# 		                    			action :manage
+# 									end	
+# 								end
+# 								# group local_group do
+# 			 				# 		excluded_members local_user
+# 	       #              			append true
+# 	       #              			action :manage
+# 								# end
+						
+# 							end #|local_group|
+# 					end	#|local_user| 		
+# 				end #Array(group).each do |group|
+# 			end #roles.each do |role, group|
+# 		#end #if u['roles'].any?{|role, group| node.roles.include?(role)}	
+# 	end #unless u['roles'].to_a.empty?
+# end #search(:test_users) do |u|
