@@ -8,8 +8,4 @@ version          '0.1.0'
 depends         'sudo'
 
 
-# attribute 'sys_dir',
-#   :display_name => 'dirname',
-#   :description  => '',
-#   :type         => 'string',
-#   :default      => 'grammarly'
+# 
